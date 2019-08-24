@@ -61,8 +61,9 @@
             ?>
             
             // Initialize map
-            var mymap = L.map('mapid').setView([33.5641086, -112.1946049], 10);
-            L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', { maxZoom: 15 }).addTo(mymap);
+            var map = L.map('mapid').setView([33.5641086, -112.1946049], 10);
+            map.scrollWheelZoom.disable();
+            L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', { maxZoom: 15 }).addTo(map);
             
             // Loop through each portfolio and create a pin and popup
             Portfolio.forEach(function(value, i){
@@ -70,7 +71,7 @@
                 var link = value['link'];
                 var geo = value['geo'];
                 if (geo != null){
-                    var marker = L.marker(geo).addTo(mymap);
+                    var marker = L.marker(geo).addTo(map);
                     marker.bindPopup('<a href="'+link+'" target="_top">'+name+'</a>')
                 }
                 else console.log('Portfolio "' + name + '" is missing custom field "geo"');
