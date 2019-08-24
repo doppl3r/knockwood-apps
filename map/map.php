@@ -8,6 +8,13 @@
         <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js" integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og==" crossorigin=""></script>
         <style>
             html, body, #mapid { height: 100%; width: 100%; margin: 0; overflow: hidden; }
+            .leaflet-popup-content-wrapper { padding: 0; border-radius: 0; box-shadow: 0 3px 5px rgba(0, 0, 0, 0.15); width: 180px; }
+            .leaflet-popup-content { margin: 0; padding: 0 0 12px; }
+            .leaflet-popup-content h2 { margin: 0; padding: 0 12px; }
+            .leaflet-popup-content p { margin: 0; padding: 0 12px; }
+            .leaflet-popup-content a { text-decoration: none; display: inline-block; }
+            .leaflet-popup-content img { display: block; max-width: 100%; padding: 0 0 12px; background-image: #ccc; }
+            .leaflet-container a.leaflet-popup-close-button { color: #000; }
         </style>
     </head>
     <body>
@@ -47,7 +54,9 @@
                 foreach( $recent_posts as $index => $recent ) {
                     $portfolio[$index]['name'] = $recent["post_title"];
                     $portfolio[$index]['link'] = get_permalink($recent["ID"]);
-
+                    $portfolio[$index]['terms'] = wp_get_post_terms($recent['ID'], 'portfolio_category', ['orderby' => 'name', 'order' => 'ASC', 'fields' => 'all'])[0];
+                    $portfolio[$index]['thumbnail'] = wp_get_attachment_url( get_post_thumbnail_id($recent["ID"]), 'thumbnail' );
+                    
                     // Loop through custom fields for geo coordinates
                     $custom_fields = get_post_custom($recent['ID']);
                     foreach($custom_fields as $key => $value) {
@@ -69,16 +78,27 @@
             L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', { maxZoom: 15 }).addTo(map);
             
             // Loop through each portfolio and create a pin and popup
+            var group = new L.featureGroup([]);
             portfolio.forEach(function(value){
                 var name = value['name'];
                 var link = value['link'];
                 var geo = value['geo'];
-                if (geo != null){
-                    var marker = L.marker(geo).addTo(map);
-                    marker.bindPopup('<a href="'+link+'" target="_top">'+name+'</a>')
+                var terms = value['terms'];
+                var thumbnail = value['thumbnail'];
+                if (geo != null) {
+                    var marker = L.marker(geo).addTo(group);
+                    marker.bindPopup(
+                        '<img src="' + thumbnail + '" />' +
+                        '<a href="'+link+'" target="_top"><h2>'+ name + '</h2></a>' +
+                        '<p>' + terms['name'] + '</p>'
+                    );
                 }
                 else console.log('Portfolio "' + name + '" is missing custom field "geo": ' + link);
             });
+
+            // zoom to group
+            group.addTo(map);
+            map.fitBounds(group.getBounds());
         </script>
     </body>
 </html>
