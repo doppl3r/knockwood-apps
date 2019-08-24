@@ -100,7 +100,7 @@
                     categories.forEach(function(term){
                         if (term.includes('highlight')) {
                             marker.setIcon(iconYellow);
-                            button = '<a href="' + link + '" target="_top">Learn More</a>';
+                            button = '<a href="' + link + '" target="_top">View Page</a>';
                         }
                     });
                     marker.bindPopup(
