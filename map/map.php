@@ -10,10 +10,11 @@
             html, body, #mapid { height: 100%; width: 100%; margin: 0; overflow: hidden; }
             .leaflet-popup-content-wrapper { padding: 0; border-radius: 0; box-shadow: 0 3px 5px rgba(0, 0, 0, 0.15); width: 180px; }
             .leaflet-popup-content { margin: 0; padding: 0 0 12px; text-align: center; }
-            .leaflet-popup-content h2 { margin: 0; padding: 0 12px; }
-            .leaflet-popup-content p { margin: 0; padding: 0 12px; }
-            .leaflet-popup-content a { text-decoration: none; display: inline-block; }
-            .leaflet-popup-content img { display: block; max-width: 100%; padding: 0 0 12px; background-image: #ccc; }
+            .leaflet-popup-content h2 { margin: 0; padding: 0 12px 6px; }
+            .leaflet-popup-content p { margin: 0; padding: 0 12px 6px; }
+            .leaflet-popup-content a { text-decoration: none; display: inline-block; background-color: #000; color: #fff; border-radius: 999px; padding: 4px 16px; }
+            .leaflet-popup-content a:hover { background-color: #ccc; color: #000; }
+            .leaflet-popup-content img { display: block; max-width: 100%; margin: 0 0 12px; background-color: #ccc; }
             .leaflet-container a.leaflet-popup-close-button { color: #000; }
         </style>
     </head>
@@ -53,6 +54,7 @@
                 $portfolio = [];
                 foreach( $recent_posts as $index => $recent ) {
                     $portfolio[$index]['name'] = $recent["post_title"];
+                    $portfolio[$index]['exerpt'] = get_the_excerpt($recent["ID"]);
                     $portfolio[$index]['link'] = get_permalink($recent["ID"]);
                     $portfolio[$index]['categories'] = wp_get_post_terms($recent['ID'], 'portfolio_category', ['orderby' => 'name', 'order' => 'ASC', 'fields' => 'slugs']);
                     $portfolio[$index]['thumbnail'] = wp_get_attachment_url( get_post_thumbnail_id($recent["ID"]), 'thumbnail' );
@@ -85,18 +87,27 @@
             var group = new L.featureGroup([]);
             portfolio.forEach(function(value){
                 var name = value['name'];
+                var exerpt = value['exerpt'];
                 var link = value['link'];
                 var geo = value['geo'];
                 var categories = value['categories'];
                 var thumbnail = value['thumbnail'];
+                var button = '';
 
                 // Add icon if geo coordinates exist
                 if (geo != null) {
                     var marker = L.marker(geo, { icon: iconBlack }).addTo(group);
-                    categories.forEach(function(term){ if (term.includes('highlight')) marker.setIcon(iconYellow); });
+                    categories.forEach(function(term){
+                        if (term.includes('highlight')) {
+                            marker.setIcon(iconYellow);
+                            button = '<a href="' + link + '" target="_top">Learn More</a>';
+                        }
+                    });
                     marker.bindPopup(
                         '<img src="' + thumbnail + '" />' +
-                        '<h2>'+ name + '</h2>'
+                        '<h2>'+ name + '</h2>' +
+                        '<p>'+ exerpt + '</p>' +
+                        button
                     );
                 }
                 else console.log('Portfolio "' + name + '" is missing custom field "geo": ' + link);
