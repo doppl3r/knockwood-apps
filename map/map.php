@@ -9,7 +9,7 @@
         <style>
             html, body, #mapid { height: 100%; width: 100%; margin: 0; overflow: hidden; }
             .leaflet-popup-content-wrapper { padding: 0; border-radius: 0; box-shadow: 0 3px 5px rgba(0, 0, 0, 0.15); width: 180px; }
-            .leaflet-popup-content { margin: 0; padding: 0 0 12px; }
+            .leaflet-popup-content { margin: 0; padding: 0 0 12px; text-align: center; }
             .leaflet-popup-content h2 { margin: 0; padding: 0 12px; }
             .leaflet-popup-content p { margin: 0; padding: 0 12px; }
             .leaflet-popup-content a { text-decoration: none; display: inline-block; }
@@ -54,7 +54,7 @@
                 foreach( $recent_posts as $index => $recent ) {
                     $portfolio[$index]['name'] = $recent["post_title"];
                     $portfolio[$index]['link'] = get_permalink($recent["ID"]);
-                    $portfolio[$index]['terms'] = wp_get_post_terms($recent['ID'], 'portfolio_category', ['orderby' => 'name', 'order' => 'ASC', 'fields' => 'all']);
+                    $portfolio[$index]['categories'] = wp_get_post_terms($recent['ID'], 'portfolio_category', ['orderby' => 'name', 'order' => 'ASC', 'fields' => 'slugs']);
                     $portfolio[$index]['thumbnail'] = wp_get_attachment_url( get_post_thumbnail_id($recent["ID"]), 'thumbnail' );
                     
                     // Loop through custom fields for geo coordinates
@@ -78,8 +78,8 @@
             L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(map);
             
             // Icon options
-            var iconYellow = L.icon({ iconUrl: 'icon-yellow.png', shadowUrl: 'icon-shadow.png', iconSize: [25, 41], shadowSize: [41, 41], iconAnchor: [13, 41], shadowAnchor: [13, 41], popupAnchor: [-3, -41] });
-            var iconBlack = L.icon({ iconUrl: 'icon-black.png', shadowUrl: 'icon-shadow.png', iconSize: [25, 41], shadowSize: [41, 41], iconAnchor: [13, 41], shadowAnchor: [13, 41], popupAnchor: [-3, -41] });
+            var iconBlack  = L.icon({ iconUrl: 'icon-black.png',  shadowUrl: 'icon-shadow.png', iconSize: [25, 41], shadowSize: [41, 41], iconAnchor: [13, 41], shadowAnchor: [13, 41], popupAnchor: [0, -41] });
+            var iconYellow = L.icon({ iconUrl: 'icon-yellow.png', shadowUrl: 'icon-shadow.png', iconSize: [25, 41], shadowSize: [41, 41], iconAnchor: [13, 41], shadowAnchor: [13, 41], popupAnchor: [0, -41] });
             
             // Loop through each portfolio and create a pin and popup
             var group = new L.featureGroup([]);
@@ -87,14 +87,13 @@
                 var name = value['name'];
                 var link = value['link'];
                 var geo = value['geo'];
-                var terms = value['terms'];
+                var categories = value['categories'];
                 var thumbnail = value['thumbnail'];
 
                 // Add icon if geo coordinates exist
                 if (geo != null) {
-                    var marker = L.marker(geo).addTo(group);
-                    marker.setIcon(iconBlack); // Default black icon
-                    terms.forEach(function(term){ if (term['slug'].includes('highlight')) marker.setIcon(iconYellow); });
+                    var marker = L.marker(geo, { icon: iconBlack }).addTo(group);
+                    categories.forEach(function(term){ if (term.includes('highlight')) marker.setIcon(iconYellow); });
                     marker.bindPopup(
                         '<img src="' + thumbnail + '" />' +
                         '<h2>'+ name + '</h2>'
