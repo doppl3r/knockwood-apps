@@ -54,7 +54,7 @@
                 foreach( $recent_posts as $index => $recent ) {
                     $portfolio[$index]['name'] = $recent["post_title"];
                     $portfolio[$index]['link'] = get_permalink($recent["ID"]);
-                    $portfolio[$index]['terms'] = wp_get_post_terms($recent['ID'], 'portfolio_category', ['orderby' => 'name', 'order' => 'ASC', 'fields' => 'all'])[0];
+                    $portfolio[$index]['terms'] = wp_get_post_terms($recent['ID'], 'portfolio_category', ['orderby' => 'name', 'order' => 'ASC', 'fields' => 'all']);
                     $portfolio[$index]['thumbnail'] = wp_get_attachment_url( get_post_thumbnail_id($recent["ID"]), 'thumbnail' );
                     
                     // Loop through custom fields for geo coordinates
@@ -73,9 +73,13 @@
             ?>
             
             // Initialize map
-            var map = L.map('mapid').setView([33.5641086, -112.1946049], 10);
+            var map = L.map('mapid', { dragging: !L.Browser.mobile, tap: false }).setView([33.5641086, -112.1946049], 10);
             map.scrollWheelZoom.disable();
-            L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', { maxZoom: 15 }).addTo(map);
+            L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(map);
+            
+            // Icon options
+            var iconYellow = L.icon({ iconUrl: 'icon-yellow.png', shadowUrl: 'icon-shadow.png', iconSize: [25, 41], shadowSize: [41, 41], iconAnchor: [13, 41], shadowAnchor: [13, 41], popupAnchor: [-3, -41] });
+            var iconBlack = L.icon({ iconUrl: 'icon-black.png', shadowUrl: 'icon-shadow.png', iconSize: [25, 41], shadowSize: [41, 41], iconAnchor: [13, 41], shadowAnchor: [13, 41], popupAnchor: [-3, -41] });
             
             // Loop through each portfolio and create a pin and popup
             var group = new L.featureGroup([]);
@@ -85,12 +89,15 @@
                 var geo = value['geo'];
                 var terms = value['terms'];
                 var thumbnail = value['thumbnail'];
+
+                // Add icon if geo coordinates exist
                 if (geo != null) {
                     var marker = L.marker(geo).addTo(group);
+                    marker.setIcon(iconBlack); // Default black icon
+                    terms.forEach(function(term){ if (term['slug'].includes('highlight')) marker.setIcon(iconYellow); });
                     marker.bindPopup(
                         '<img src="' + thumbnail + '" />' +
-                        '<a href="'+link+'" target="_top"><h2>'+ name + '</h2></a>' +
-                        '<p>' + terms['name'] + '</p>'
+                        '<h2>'+ name + '</h2>'
                     );
                 }
                 else console.log('Portfolio "' + name + '" is missing custom field "geo": ' + link);
