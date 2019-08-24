@@ -13,10 +13,10 @@
         <div id="mapid"></div>
         <script>
             <?php
-                // initialize wordpress database
+                // Initialize Wordpress database
                 require_once(dirname(__FILE__) . '/wp-config.php');
                 
-                // define search query
+                // Define search query
                 $args = array(
                     'numberposts' => -1,
                     'orderby' => 'post_date',
@@ -26,7 +26,7 @@
                     'suppress_filters' => true
                 );
 
-                // use parameter to filter map results by category
+                // Use parameter to filter map results by category
                 $category = $_GET["category"];
                 if (isset($category)) {
                     $args['tax_query'] = [
@@ -38,17 +38,16 @@
                     ];
                 }
 
-                // use argument to search for recent posts
+                // Use argument to search for recent posts
                 $recent_posts = wp_get_recent_posts( $args, ARRAY_A );
                 
-                // list all search results
+                // List all search results
                 $portfolio = [];
                 foreach( $recent_posts as $index => $recent ) {
-                    $portfolio[$index] = [];
                     $portfolio[$index]['name'] = $recent["post_title"];
                     $portfolio[$index]['link'] = get_permalink($recent["ID"]);
 
-                    // loop through custom fields for geo coordinates
+                    // Loop through custom fields for geo coordinates
                     $custom_fields = get_post_custom($recent['ID']);
                     foreach($custom_fields as $key => $value) {
                         if (isset($custom_fields['geo'])) {
@@ -57,6 +56,8 @@
                         }
                     }
                 }
+
+                // Print JS object for leaflet.js
                 echo 'var portfolio = '.json_encode($portfolio).';';
                 wp_reset_query();
             ?>
@@ -67,7 +68,7 @@
             L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', { maxZoom: 15 }).addTo(map);
             
             // Loop through each portfolio and create a pin and popup
-            portfolio.forEach(function(value, i){
+            portfolio.forEach(function(value){
                 var name = value['name'];
                 var link = value['link'];
                 var geo = value['geo'];
