@@ -42,21 +42,22 @@
                 $recent_posts = wp_get_recent_posts( $args, ARRAY_A );
                 
                 // list all search results
-                $Portfolio = [];
+                $portfolio = [];
                 foreach( $recent_posts as $index => $recent ) {
-                    $Portfolio[$index] = [];
-                    $Portfolio[$index]['name'] = $recent["post_title"];
-                    $Portfolio[$index]['link'] = get_permalink($recent["ID"]);
+                    $portfolio[$index] = [];
+                    $portfolio[$index]['name'] = $recent["post_title"];
+                    $portfolio[$index]['link'] = get_permalink($recent["ID"]);
+
                     // loop through custom fields for geo coordinates
                     $custom_fields = get_post_custom($recent['ID']);
                     foreach($custom_fields as $key => $value) {
-                        if(isset($custom_fields['geo'])) {
-                            $Portfolio[$index]['geo'] = explode(',', $custom_fields['geo'][0]);
+                        if (isset($custom_fields['geo'])) {
+                            $portfolio[$index]['geo'] = explode(',', $custom_fields['geo'][0]);
                             break;
                         }
                     }
                 }
-                echo 'var Portfolio = '.json_encode($Portfolio).';';
+                echo 'var portfolio = '.json_encode($portfolio).';';
                 wp_reset_query();
             ?>
             
@@ -66,7 +67,7 @@
             L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', { maxZoom: 15 }).addTo(map);
             
             // Loop through each portfolio and create a pin and popup
-            Portfolio.forEach(function(value, i){
+            portfolio.forEach(function(value, i){
                 var name = value['name'];
                 var link = value['link'];
                 var geo = value['geo'];
@@ -74,7 +75,7 @@
                     var marker = L.marker(geo).addTo(map);
                     marker.bindPopup('<a href="'+link+'" target="_top">'+name+'</a>')
                 }
-                else console.log('Portfolio "' + name + '" is missing custom field "geo"');
+                else console.log('Portfolio "' + name + '" is missing custom field "geo": ' + link);
             });
         </script>
     </body>
