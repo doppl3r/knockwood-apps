@@ -74,10 +74,10 @@
                 wp_reset_query();
             ?>
             
-            // Initialize map
-            var map = L.map('mapid', { dragging: !L.Browser.mobile, tap: false }).setView([33.5641086, -112.1946049], 10);
+            // Initialize map - https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png
+            var map = L.map('mapid', { dragging: !L.Browser.mobile, tap: false, zoomControl: false }).setView([33.5641086, -112.1946049], 10);
             map.scrollWheelZoom.disable();
-            L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(map);
+            L.tileLayer('https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png', { maxZoom: 18 }).addTo(map);
             
             // Icon options
             var iconBlack  = L.icon({ iconUrl: 'icon-black.png',  shadowUrl: 'icon-shadow.png', iconSize: [25, 41], shadowSize: [41, 41], iconAnchor: [13, 41], shadowAnchor: [13, 41], popupAnchor: [0, -41] });
@@ -97,8 +97,8 @@
                 // Add icon if geo coordinates exist
                 if (geo != null) {
                     var marker = L.marker(geo, { icon: iconBlack }).addTo(group);
-                    categories.forEach(function(term){
-                        if (term.includes('highlight')) {
+                    categories.forEach(function(category){
+                        if (category.includes('highlight')) {
                             marker.setIcon(iconYellow);
                             button = '<a href="' + link + '" target="_top">View Page</a>';
                         }
@@ -113,9 +113,10 @@
                 else console.log('Portfolio "' + name + '" is missing custom field "geo": ' + link);
             });
 
-            // zoom to group
+            // zoom settings
             group.addTo(map);
             map.fitBounds(group.getBounds());
+            L.control.zoom({ position:'bottomright' }).addTo(map);
         </script>
     </body>
 </html>
