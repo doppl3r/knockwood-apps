@@ -80,8 +80,8 @@
             L.tileLayer('https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png', { maxZoom: 18 }).addTo(map);
             
             // Icon options
-            var iconBlack  = L.icon({ iconUrl: 'icon-black.png',  shadowUrl: 'icon-shadow.png', iconSize: [25, 41], shadowSize: [41, 41], iconAnchor: [13, 41], shadowAnchor: [13, 41], popupAnchor: [0, -41] });
-            var iconYellow = L.icon({ iconUrl: 'icon-yellow.png', shadowUrl: 'icon-shadow.png', iconSize: [25, 41], shadowSize: [41, 41], iconAnchor: [13, 41], shadowAnchor: [13, 41], popupAnchor: [0, -41] });
+            var iconOne = L.icon({ iconUrl: 'iconOne.png', shadowUrl: 'iconShadow.png', iconSize: [25, 41], shadowSize: [41, 41], iconAnchor: [13, 41], shadowAnchor: [13, 41], popupAnchor: [0, -41] });
+            var iconTwo = L.icon({ iconUrl: 'iconTwo.png', shadowUrl: 'iconShadow.png', iconSize: [25, 41], shadowSize: [41, 41], iconAnchor: [13, 41], shadowAnchor: [13, 41], popupAnchor: [0, -41] });
             
             // Loop through each portfolio and create a pin and popup
             var group = new L.featureGroup([]);
@@ -96,10 +96,10 @@
 
                 // Add icon if geo coordinates exist
                 if (geo != null) {
-                    var marker = L.marker(geo, { icon: iconBlack }).addTo(group);
+                    var marker = L.marker(geo, { icon: iconOne }).addTo(group);
                     categories.forEach(function(category){
                         if (category.includes('highlight')) {
-                            marker.setIcon(iconYellow);
+                            marker.setIcon(iconTwo);
                             button = '<a href="' + link + '" target="_top">View Page</a>';
                         }
                     });
