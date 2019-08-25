@@ -12,8 +12,8 @@
             .leaflet-popup-content { margin: 0; padding: 0 0 12px; text-align: center; }
             .leaflet-popup-content h2 { margin: 0; padding: 0 12px 6px; }
             .leaflet-popup-content p { margin: 0; padding: 0 12px 6px; }
-            .leaflet-popup-content a { text-decoration: none; display: inline-block; background-color: #000; color: #fff; border-radius: 999px; padding: 4px 16px; }
-            .leaflet-popup-content a:hover { background-color: #ccc; color: #000; }
+            .leaflet-popup-content a { background-color: #eee; color: #333; text-decoration: none; display: inline-block; padding: 4px 16px; }
+            .leaflet-popup-content a:hover { background-color: #333; color: #fff; }
             .leaflet-popup-content img { display: block; max-width: 100%; margin: 0 0 12px; background-color: #ccc; }
             .leaflet-container a.leaflet-popup-close-button { color: #000; }
         </style>
@@ -74,10 +74,12 @@
                 wp_reset_query();
             ?>
             
-            // Initialize map - https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png
+            // Initialize map
+            // (faster) - https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png
+            // (slower) - https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png
             var map = L.map('mapid', { dragging: !L.Browser.mobile, tap: false, zoomControl: false }).setView([33.5641086, -112.1946049], 10);
             map.scrollWheelZoom.disable();
-            L.tileLayer('https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png', { maxZoom: 18 }).addTo(map);
+            L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(map);
             
             // Icon options
             var iconOne = L.icon({ iconUrl: 'iconOne.png', shadowUrl: 'iconShadow.png', iconSize: [25, 41], shadowSize: [41, 41], iconAnchor: [13, 41], shadowAnchor: [13, 41], popupAnchor: [0, -41] });
